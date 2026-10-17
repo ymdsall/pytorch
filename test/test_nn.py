@@ -2695,6 +2695,9 @@ tensor(..., device='meta', size=(1,), requires_grad=True)""")
             ("input_dtype", ValueError, "RNN input dtype"),
             ("hidden_layers", RuntimeError, r"Expected hidden\[0\] size"),
             ("hidden_batch", RuntimeError, r"Expected hidden\[0\] size"),
+            # Locks in the pre-permute ordering: a too-large hidden batch used to
+            # be silently accepted when the check ran after permute_hidden.
+            ("hidden_batch_too_large", RuntimeError, r"Expected hidden\[0\] size"),
             ("hidden_size", RuntimeError, r"Expected hidden\[0\] size"),
             ("cell_size", RuntimeError, r"Expected hidden\[1\] size"),
         ],
@@ -2711,6 +2714,8 @@ tensor(..., device='meta', size=(1,), requires_grad=True)""")
             hx = (torch.zeros(3, 3, 3), torch.zeros(3, 3, 3))
         elif invalid_arg == "hidden_batch":
             hx = (torch.zeros(2, 2, 3), torch.zeros(2, 2, 3))
+        elif invalid_arg == "hidden_batch_too_large":
+            hx = (torch.zeros(2, 4, 3), torch.zeros(2, 4, 3))
         elif invalid_arg == "hidden_size":
             hx = (torch.zeros(2, 3, 4), torch.zeros(2, 3, 3))
         elif invalid_arg == "cell_size":
